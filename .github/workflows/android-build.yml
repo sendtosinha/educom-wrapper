@@ -24,8 +24,9 @@ jobs:
 
       - name: Install npm deps & Capacitor Android
         run: |
-          npm ci
+          npm install
           npx cap sync android
+
 
       - name: Prepare keystore from secret and build
         env:
