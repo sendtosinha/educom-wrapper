@@ -26,6 +26,11 @@ jobs:
         run: |
           npm install
           npx cap sync android
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleRelease
 
 
       - name: Prepare keystore from secret and build
