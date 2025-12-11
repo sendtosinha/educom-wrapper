@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     namespace "com.edugeeks.app"
     compileSdkVersion rootProject.ext.compileSdkVersion
+
     defaultConfig {
         applicationId "com.edugeeks.app"
         minSdkVersion rootProject.ext.minSdkVersion
@@ -11,15 +12,31 @@ android {
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
-             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
-             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+
+    // ✅ ADD THIS BLOCK
+    signingConfigs {
+        release {
+            storeFile file('dron.keystore')
+            storePassword 'dronstudy'
+            keyAlias 'dronstudy'
+            keyPassword 'dronstudy'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            // ✅ ADD THIS LINE
+            signingConfig signingConfigs.release
+        }
+        debug {
+            signingConfig signingConfigs.release
         }
     }
 }
