@@ -8,32 +8,34 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: "18"
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
-      - name: Install npm deps & Capacitor Android
+      - name: Install dependencies & sync Android
         run: |
           npm install
           npx cap sync android
 
-      - name: Build APK
+      - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
+          ./gradlew clean
           ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
-          path: android/app/build/outputs/apk/release/app-release.apk
+          path: android/app/build/outputs/apk/release/*.apk
