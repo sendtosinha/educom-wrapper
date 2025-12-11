@@ -28,7 +28,7 @@ jobs:
       - name: Sync Android
         run: npx cap sync android
 
-      # Decode keystore from GitHub Secret
+      # Decode keystore
       - name: Decode Keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -41,12 +41,12 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease \
-            -Pandroid.injected.signing.store.file=app/dron.keystore \
+            -Pandroid.injected.signing.store.file=dron.keystore \
             -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
             -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
             -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
-      # Show APK path
+      # Show APK output path
       - name: Show APK output
         run: find android/app/build/outputs/apk -type f -name "*.apk" -print
 
@@ -56,4 +56,3 @@ jobs:
         with:
           name: Signed-App-Release
           path: android/app/build/outputs/apk/release/app-release.apk
-          
