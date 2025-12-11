@@ -8,34 +8,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "18"
+          node-version: '18'
 
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          distribution: "temurin"
-          java-version: "17"
+          distribution: temurin
+          java-version: '17'
 
-      - name: Install dependencies & sync Android
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create Capacitor asset files manually
         run: |
-          npm install
-          npx cap sync android
+          mkdir -p android/app/src/main/assets
+          echo '{}' > android/app/src/main/assets/capacitor.config.json
+          echo '{}' > android/app/src/main/assets/capacitor.plugins.json
 
-      - name: Build Android APK
+      - name: Sync Android
+        run: npx cap sync android
+
+      - name: Build APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew clean
           ./gradlew assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
-          path: android/app/build/outputs/apk/release/*.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
