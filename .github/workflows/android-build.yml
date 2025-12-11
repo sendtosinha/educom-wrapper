@@ -1,7 +1,8 @@
 name: Build Android Release
-
 on:
   workflow_dispatch:
+  push:
+    branches: [ main ]
 
 jobs:
   build:
@@ -24,28 +25,35 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Create Capacitor asset files manually
-        run: |
-          mkdir -p android/app/src/main/assets
-          echo '{}' > android/app/src/main/assets/capacitor.config.json
-          echo '{}' > android/app/src/main/assets/capacitor.plugins.json
-
       - name: Sync Android
         run: npx cap sync android
 
-      - name: Build APK
+      # Decode keystore from GitHub Secret
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 --decode > android/app/dron.keystore
+
+      # Build Signed Release APK
+      - name: Build Signed APK
         run: |
           cd android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=app/dron.keystore \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
-      - name: Show APK output folders
-        run: |
-          echo "Searching for APK files..."
-          find android/app -type f -name "*.apk" -print
+      # Show APK path
+      - name: Show APK output
+        run: find android/app/build/outputs/apk -type f -name "*.apk" -print
 
+      # Upload Signed APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-unsigned.apk
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          name: Signed-App-Release
+          path: android/app/build/outputs/apk/release/app-release.apk
+          
