@@ -40,10 +40,11 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleRelease \
-          -Pandroid.injected.signing.store.file=../app/dron.keystore \
+          -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/android/app/dron.keystore \
           -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
           -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
           -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+
 
       - name: Show APK
         run: find android/app/build/outputs -type f -name "*.apk" -print
