@@ -25,6 +25,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # ⬅️ IMPORTANT: Remove old embedded UI
+      - name: Clean Android web assets
+        run: rm -rf android/app/src/main/assets/public
+
+      # ⬅️ Re-sync new UI files
       - name: Sync Android
         run: npx cap sync android
 
@@ -44,7 +49,6 @@ jobs:
           -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
           -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
           -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
-
 
       - name: Show APK
         run: find android/app/build/outputs -type f -name "*.apk" -print
